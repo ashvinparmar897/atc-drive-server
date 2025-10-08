@@ -1,6 +1,7 @@
-from sqlalchemy import Column, Integer, String, ForeignKey
+from sqlalchemy import Column, Integer, String, ForeignKey, DateTime
 from sqlalchemy.orm import relationship
 from app.db.base import Base
+from datetime import datetime
 
 class File(Base):
     __tablename__ = "files"
@@ -11,5 +12,7 @@ class File(Base):
     uploaded_by = Column(Integer, ForeignKey('users.id'))
     storage_type = Column(String, default="s3")  # 's3' or 'local'
     storage_key = Column(String, nullable=True)   # s3 key or local path
+    file_size = Column(Integer, nullable=True)
+    created_at = Column(DateTime, default=datetime.utcnow)
     folder = relationship("Folder", back_populates="files")
     uploader = relationship("User", back_populates="files") 

@@ -25,8 +25,9 @@ def register(user: UserCreate, db: Session = Depends(get_db)):
     if existing_email:
         raise HTTPException(status_code=400, detail="Email already registered")
     
-    # Create user with default viewer role
-    user.role = RoleEnum.viewer
+    # Create user with the specified role or default to viewer
+    if not user.role:
+        user.role = RoleEnum.viewer
     new_user = create_user(db, user)
     
     # Send welcome email

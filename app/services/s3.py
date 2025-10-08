@@ -1,6 +1,7 @@
 import boto3
 import os
 from botocore.exceptions import NoCredentialsError
+from botocore.client import Config
 from fastapi import UploadFile
 from uuid import uuid4
 from app.core.config import settings
@@ -9,7 +10,8 @@ s3 = boto3.client(
     "s3",
     aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
     aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY,
-    region_name=settings.AWS_REGION
+    region_name=settings.AWS_REGION,
+    config=Config(s3={"addressing_style": "virtual"})
 )
 
 async def upload_file_to_s3(file: UploadFile, folder: str = ""):

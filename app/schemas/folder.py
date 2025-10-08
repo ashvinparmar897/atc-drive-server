@@ -6,14 +6,12 @@ from app.models.user import RoleEnum
 class FolderBase(BaseModel):
     name: str
     parent_id: Optional[int] = None
-    access_control: Optional[Dict[str, str]] = None
 
 class FolderCreate(FolderBase):
     pass
 
 class FolderUpdate(BaseModel):
     name: Optional[str] = None
-    access_control: Optional[Dict[str, str]] = None
 
 class FolderOut(FolderBase):
     id: int

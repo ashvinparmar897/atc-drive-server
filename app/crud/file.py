@@ -2,14 +2,13 @@ from sqlalchemy.orm import Session
 from app.models.file import File
 from app.schemas.file import FileCreate, FileUpdate, FileMove
 
-def create_file(db: Session, file: FileCreate, s3_key: str = None, uploaded_by: int = None, storage_type: str = "local", storage_key: str = None):
+def create_file(db: Session, file: FileCreate, uploaded_by: int, storage_type: str = "local", storage_key: str = None):
     db_file = File(
         filename=file.filename,
         folder_id=file.folder_id,
-        s3_key=s3_key,
         uploaded_by=uploaded_by,
         storage_type=storage_type,
-        storage_key=storage_key or s3_key
+        storage_key=storage_key
     )
     db.add(db_file)
     db.commit()

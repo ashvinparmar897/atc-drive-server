@@ -1,14 +1,15 @@
 from sqlalchemy.orm import Session
 from app.models.folder import Folder
+from app.models.folder_permissions import FolderPermission
 from app.schemas.folder import FolderCreate, FolderUpdate
+from app.models.user import RoleEnum
 from typing import List, Optional
 
 def create_folder(db: Session, folder: FolderCreate, owner_id: int) -> Folder:
     db_folder = Folder(
         name=folder.name,
         parent_id=folder.parent_id,
-        owner_id=owner_id,
-        access_control=folder.access_control
+        owner_id=owner_id
     )
     db.add(db_folder)
     db.commit()
@@ -23,7 +24,7 @@ def get_folders(db: Session, parent_id: Optional[int] = None, skip: int = 0, lim
     if parent_id is not None:
         query = query.filter(Folder.parent_id == parent_id)
     else:
-        query = query.filter(Folder.parent_id == None)  # Root folders
+        query = query.filter(Folder.parent_id.is_(None))
     return query.offset(skip).limit(limit).all()
 
 def update_folder(db: Session, folder_id: int, folder_update: FolderUpdate) -> Optional[Folder]:
@@ -44,8 +45,8 @@ def delete_folder(db: Session, folder_id: int) -> bool:
     if not db_folder:
         return False
     
-    # Check if folder has files or subfolders
-    has_files = db.query(db_folder.files).count() > 0
+    from app.models.file import File
+    has_files = db.query(File).filter(File.folder_id == folder_id).count() > 0
     has_subfolders = db.query(Folder).filter(Folder.parent_id == folder_id).count() > 0
     
     if has_files or has_subfolders:
@@ -56,7 +57,6 @@ def delete_folder(db: Session, folder_id: int) -> bool:
     return True
 
 def get_folder_path(db: Session, folder_id: int) -> List[Folder]:
-    """Get the full path to a folder"""
     path = []
     current_folder = get_folder(db, folder_id)
     
@@ -70,23 +70,7 @@ def get_folder_path(db: Session, folder_id: int) -> List[Folder]:
     return path
 
 def get_user_accessible_folders(db: Session, user_id: int, user_role: str) -> List[Folder]:
-    """Get folders accessible to a specific user based on their role"""
     if user_role == "admin":
         return db.query(Folder).all()
     
-    # For non-admin users, get folders they own or have access to
-    accessible_folders = []
-    
-    # Owned folders
-    owned_folders = db.query(Folder).filter(Folder.owner_id == user_id).all()
-    accessible_folders.extend(owned_folders)
-    
-    # Folders with access control
-    folders_with_access = db.query(Folder).filter(Folder.access_control != None).all()
-    for folder in folders_with_access:
-        if folder.access_control and str(user_id) in folder.access_control:
-            user_folder_role = folder.access_control[str(user_id)]
-            if user_folder_role in ["admin", "editor", "viewer"]:
-                accessible_folders.append(folder)
-    
-    return accessible_folders 
+    return db.query(Folder).join(FolderPermission).filter(FolderPermission.user_id == user_id).all()

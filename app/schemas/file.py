@@ -15,12 +15,16 @@ class FileUpdate(BaseModel):
 class FileMove(BaseModel):
     new_folder_id: int
 
+from datetime import datetime
+
 class FileOut(FileBase):
     id: int
     s3_key: Optional[str] = None
     uploaded_by: int
     storage_type: Optional[str] = None
     storage_key: Optional[str] = None
+    file_size: Optional[int] = None
+    created_at: Optional[datetime] = None
     
     class Config:
         from_attributes = True 
