@@ -1,12 +1,12 @@
 import os
-from typing import List
-
 from dotenv import load_dotenv
+from typing import List
 
 load_dotenv()
 
+
 class Settings:
-    DATABASE_URL: str = os.getenv('DATABASE_URL', 'postgresql://postgres:password@127.0.0.1/atc-drive')
+    DATABASE_URL: str = os.getenv('DATABASE_URL', 'postgresql://atc_user:ATCrocks2025@localhost/atc-drive-v2')
     AWS_ACCESS_KEY_ID: str = os.getenv('AWS_ACCESS_KEY_ID', '')
     AWS_SECRET_ACCESS_KEY: str = os.getenv('AWS_SECRET_ACCESS_KEY', '')
     AWS_S3_BUCKET: str = os.getenv('AWS_S3_BUCKET', '')
@@ -17,7 +17,7 @@ class Settings:
     STORAGE_BACKEND: str = os.getenv('STORAGE_BACKEND', 'local')
     LOCAL_UPLOADS_PATH: str = os.getenv('LOCAL_UPLOADS_PATH', 'uploads')
     ALGORITHM: str = os.getenv('ALGORITHM', 'SH256')
-    
+
     # Email configuration
     SMTP_SERVER: str = os.getenv('SMTP_SERVER', 'smtp.gmail.com')
     SMTP_PORT: int = int(os.getenv('SMTP_PORT', '587'))
@@ -28,5 +28,6 @@ class Settings:
     @property
     def cors_origins_list(self) -> List[str]:
         return [origin.strip() for origin in self.CORS_ORIGINS.split(',')]
+
 
 settings = Settings()
