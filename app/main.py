@@ -30,7 +30,3 @@ if settings.STORAGE_BACKEND == "local":
 @app.get("/")
 def root():
     return {"msg": "ATC Drive Backend Running"}
-
-@app.get("/health")
-def health_check():
-    return {"status": "healthy", "database_url": settings.DATABASE_URL} 

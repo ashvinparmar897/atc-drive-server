@@ -31,10 +31,10 @@ def register(user: UserCreate, db: Session = Depends(get_db)):
     new_user = create_user(db, user)
     
     # Send welcome email
-    try:
-        email_service.send_welcome_email(new_user.email, new_user.username)
-    except Exception as e:
-        print(f"Failed to send welcome email: {e}")
+    # try:
+    #     email_service.send_welcome_email(new_user.email, new_user.username)
+    # except Exception as e:
+    #     print(f"Failed to send welcome email: {e}")
     
     return new_user
 
